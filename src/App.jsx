@@ -1,18 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Send, FileText, Leaf, Recycle, Mail, ClipboardCheck, Trash2 } from 'lucide-react';
+import {
+  Send,
+  FileText,
+  Leaf,
+  Recycle,
+  Mail,
+  ClipboardCheck,
+  Trash2,
+  PanelRight,
+  Plus,
+  Sparkles
+} from 'lucide-react';
 import './App.css';
 
 export default function App() {
+  const welcomeText =
+    'مرحباً بك في مساعد إعادة التدوير الذكي للجامعات الأردنية 🌱\n\n' +
+    'ابدأ بسؤال بسيط حول إعادة التدوير أو الاستدامة، وسأرشدك إلى معلومات عملية تدعم بيئة جامعية أفضل.';
+
   const initialMessage = {
     id: 1,
     role: 'ai',
-    text:
-      'مرحباً بك في مساعد إعادة التدوير الذكي للجامعات الأردنية 🌱\n\n' +
-      'أنا هنا لمساعدتكم في تعزيز الوعي البيئي وتقديم المعلومات الدقيقة حول ممارسات إعادة التدوير داخل الحرم الجامعي.\n\n' +
-      'يمكنك الضغط على أحد الأسئلة المقترحة بالأسفل أو كتابة سؤالك مباشرة.\n\n' +
-      'كيف يمكنني مساعدتك اليوم؟'
+    text: welcomeText
   };
 
   const [messages, setMessages] = useState(() => {
@@ -24,25 +35,40 @@ export default function App() {
     }
   });
 
+  const [chatHistory, setChatHistory] = useState(() => {
+    const savedHistory = localStorage.getItem('chatHistory');
+    try {
+      return savedHistory ? JSON.parse(savedHistory) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef(null);
 
   const quickQuestions = [
     {
-      label: 'إرشادات فرز النفايات',
-      prompt: 'كيف يمكن فرز النفايات بشكل صحيح داخل الحرم الجامعي؟',
+      label: 'أين أجد حاويات البلاستيك؟',
+      prompt: 'أين أجد حاويات البلاستيك داخل الحرم الجامعي؟',
       icon: Recycle
     },
     {
-      label: 'أنواع النفايات',
-      prompt: 'ما هي أنواع النفايات التي يمكن أن تنتج داخل الجامعة؟',
+      label: 'كيف أعيد تدوير الورق؟',
+      prompt: 'كيف يمكن إعادة تدوير الورق بشكل صحيح داخل الجامعة؟',
       icon: FileText
     },
     {
-      label: 'أهمية إعادة التدوير',
-      prompt: 'ما أهمية إعادة التدوير للبيئة والمجتمع؟',
+      label: 'نصائح لتقليل النفايات',
+      prompt: 'ما أهم النصائح لتقليل النفايات داخل الحرم الجامعي؟',
       icon: Leaf
+    },
+    {
+      label: 'سياسة الاستدامة',
+      prompt: 'ما أهمية الاستدامة البيئية في الجامعات؟',
+      icon: Sparkles
     }
   ];
 
@@ -51,12 +77,35 @@ export default function App() {
   }, [messages]);
 
   useEffect(() => {
+    localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+  }, [chatHistory]);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
+  const createChatTitle = (text) => {
+    const clean = text.trim();
+    return clean.length > 28 ? clean.slice(0, 28) + '...' : clean;
+  };
+
+  const saveToHistory = (question) => {
+    const title = createChatTitle(question);
+
+    setChatHistory((prev) => {
+      const updated = [title, ...prev.filter((item) => item !== title)];
+      return updated.slice(0, 6);
+    });
+  };
+
   const clearChat = () => {
     setMessages([initialMessage]);
-    localStorage.removeItem('chatMessages');
+    localStorage.setItem('chatMessages', JSON.stringify([initialMessage]));
+  };
+
+  const startNewChat = () => {
+    clearChat();
+    setInputValue('');
   };
 
   const sendMessage = async (messageText) => {
@@ -71,6 +120,7 @@ export default function App() {
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
+    saveToHistory(messageText);
 
     try {
       const response = await fetch('/.netlify/functions/chat', {
@@ -84,7 +134,6 @@ export default function App() {
       });
 
       const data = await response.json();
-      console.log('Function response:', data);
 
       if (!response.ok) {
         throw new Error(data.details || data.error || 'Unknown server error');
@@ -97,7 +146,7 @@ export default function App() {
           data.reply ||
           data.output ||
           data.text ||
-          'تم استلام رسالتك بنجاح من نظام n8n.'
+          'تم استلام رسالتك بنجاح من النظام.'
       };
 
       setMessages((prev) => [...prev, aiMessage]);
@@ -126,265 +175,198 @@ export default function App() {
     sendMessage(prompt);
   };
 
+  const isOnlyWelcome =
+    messages.length === 1 &&
+    messages[0].role === 'ai' &&
+    messages[0].text === welcomeText;
+
   return (
-    <div
-      dir="rtl"
-      className="ai-container"
-      style={{
-        backgroundColor: '#f8fafc',
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
-      <header
-        style={{
-          backgroundColor: '#1b4332',
-          padding: '15px 25px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <Recycle size={35} style={{ color: '#40916c' }} />
-
-          <div>
-            <h1 style={{ color: 'white', margin: 0, fontSize: '1.4rem' }}>
-              Recycling AI Assistant
-            </h1>
-
-            <p style={{ color: '#b7e4c7', margin: 0, fontSize: '0.8rem' }}>
-              نظام ذكي لتعزيز الوعي بإعادة التدوير في الجامعات الأردنية
-            </p>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <button
-            onClick={clearChat}
-            style={{
-              backgroundColor: '#ffffff',
-              color: '#1b4332',
-              border: 'none',
-              padding: '10px 14px',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-            title="مسح المحادثة"
-          >
-            <Trash2 size={16} />
-            <span>مسح المحادثة</span>
-          </button>
-
-          <button
-            onClick={() =>
-              window.open(
-                'https://forms.gle/W3xtwb49j7NsWHF59',
-                '_blank'
-              )
-            }
-            style={{
-              backgroundColor: '#fca311',
-              color: '#14213d',
-              border: 'none',
-              padding: '10px 18px',
-              borderRadius: '12px',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}
-          >
-            <ClipboardCheck size={18} />
-            <span>شاركنا رأيك بالاستبيان</span>
-          </button>
-        </div>
-      </header>
-
-      <main
-        style={{
-          flex: 1,
-          padding: '20px',
-          overflowY: 'auto'
-        }}
-      >
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            style={{
-              marginBottom: '15px',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            <div
-              style={{
-                ...(msg.role === 'user'
-                  ? {
-                      backgroundColor: '#2d6a4f',
-                      color: 'white',
-                      marginLeft: 'auto'
-                    }
-                  : {
-                      backgroundColor: 'white',
-                      color: '#333',
-                      marginRight: 'auto',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                      border: '1px solid #e5e7eb'
-                    }),
-                maxWidth: '80%',
-                padding: '12px 18px',
-                borderRadius: '15px',
-                lineHeight: '1.7',
-                whiteSpace: 'pre-wrap'
-              }}
-            >
-              {msg.role === 'ai' ? (
-                <div className="markdown-content">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {msg.text}
-                  </ReactMarkdown>
-                </div>
-              ) : (
-                msg.text
-              )}
+    <div className="app-shell" dir="rtl">
+      <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
+        <div className="sidebar-header">
+          <div className="brand-box">
+            <div className="brand-icon">
+              <Recycle size={20} />
             </div>
+            <div>
+              <h2>إيكو نود</h2>
+              <p>مساعد التدوير الجامعي</p>
+            </div>
+          </div>
 
-            {msg.id === 1 && (
-              <div
-                style={{
-                  marginTop: '12px',
-                  display: 'flex',
-                  gap: '8px',
-                  flexWrap: 'wrap'
-                }}
-              >
+          <button className="status-badge" type="button">
+            <span className="status-dot"></span>
+            AI Active
+          </button>
+        </div>
+
+        <button className="new-chat-btn" onClick={startNewChat} type="button">
+          <Plus size={16} />
+          <span>محادثة جديدة</span>
+        </button>
+
+        <div className="history-box">
+          <h3>السجل الأخير</h3>
+
+          {chatHistory.length === 0 ? (
+            <p className="history-empty">لا توجد محادثات محفوظة بعد</p>
+          ) : (
+            <ul className="history-list">
+              {chatHistory.map((item, index) => (
+                <li key={index} className="history-item">
+                  <span className="history-dot"></span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </aside>
+
+      <div className="chat-layout">
+        <header className="topbar">
+          <div className="topbar-left">
+            <button
+              className="icon-btn"
+              onClick={() => setSidebarOpen((prev) => !prev)}
+              type="button"
+              title="إظهار/إخفاء القائمة الجانبية"
+            >
+              <PanelRight size={18} />
+            </button>
+
+            <button
+              className="survey-btn"
+              onClick={() =>
+                window.open('https://forms.gle/W3xtwb49j7NsWHF59', '_blank')
+              }
+              type="button"
+            >
+              <ClipboardCheck size={18} />
+              <span>شاركنا رأيك بالاستبيان</span>
+            </button>
+          </div>
+
+          <div className="topbar-brand">
+            <div>
+              <h1>Recycling AI Assistant</h1>
+              <p>نظام ذكي لتعزيز الوعي بإعادة التدوير في الجامعات الأردنية</p>
+            </div>
+            <Recycle size={30} className="topbar-logo" />
+          </div>
+        </header>
+
+        <main className="chat-main">
+          {isOnlyWelcome ? (
+            <section className="welcome-section">
+              <div className="welcome-icon">
+                <Recycle size={40} />
+              </div>
+
+              <h2>حرم جامعي مستدام، مستقبل أذكى</h2>
+              <p>
+                اسألني عن إعادة التدوير، فرز النفايات، والممارسات البيئية داخل
+                الحرم الجامعي، وسأساعدك بمعلومات واضحة وعملية.
+              </p>
+
+              <div className="quick-grid">
                 {quickQuestions.map((item, index) => {
                   const Icon = item.icon;
 
                   return (
                     <button
                       key={index}
+                      className="quick-card"
                       onClick={() => handleQuickQuestion(item.prompt)}
-                      style={{
-                        background: '#f1f5f9',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '12px',
-                        padding: '6px 10px',
-                        fontSize: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        cursor: 'pointer'
-                      }}
+                      type="button"
                     >
-                      <Icon size={14} color="#1b4332" />
-                      {item.label}
+                      <div className="quick-card-icon">
+                        <Icon size={16} />
+                      </div>
+                      <span>{item.label}</span>
                     </button>
                   );
                 })}
               </div>
-            )}
-          </div>
-        ))}
+            </section>
+          ) : (
+            <section className="messages-section">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`message-row ${
+                    msg.role === 'user' ? 'user-row' : 'ai-row'
+                  }`}
+                >
+                  <div
+                    className={`message-bubble ${
+                      msg.role === 'user' ? 'user-bubble' : 'ai-bubble'
+                    }`}
+                  >
+                    {msg.role === 'ai' ? (
+                      <div className="markdown-content">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {msg.text}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      msg.text
+                    )}
+                  </div>
+                </div>
+              ))}
 
-        {isLoading && (
-          <div
-            style={{
-              marginBottom: '15px',
-              display: 'flex',
-              flexDirection: 'column'
-            }}
-          >
-            <div
-              style={{
-                backgroundColor: 'white',
-                color: '#333',
-                marginRight: 'auto',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                border: '1px solid #e5e7eb',
-                maxWidth: '80%',
-                padding: '12px 18px',
-                borderRadius: '15px',
-                lineHeight: '1.5'
-              }}
+              {isLoading && (
+                <div className="message-row ai-row">
+                  <div className="message-bubble ai-bubble">
+                    <div className="typing-wrap">
+                      <span className="typing-dot"></span>
+                      <span className="typing-dot"></span>
+                      <span className="typing-dot"></span>
+                      <span className="typing-text">جاري التفكير...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div ref={messagesEndRef} />
+            </section>
+          )}
+        </main>
+
+        <footer className="chat-footer">
+          <div className="input-shell">
+            <input
+              type="text"
+              placeholder="اسأل عن طرق فرز النفايات..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              disabled={isLoading}
+              className="chat-input"
+            />
+
+            <button
+              onClick={handleSendMessage}
+              disabled={isLoading}
+              className="send-btn"
+              type="button"
             >
-              <div className="typing-indicator">جاري التفكير...</div>
-            </div>
+              <Send size={18} />
+            </button>
           </div>
-        )}
 
-        <div ref={messagesEndRef} />
-      </main>
+          <div className="footer-email">
+            <Mail size={12} />
+            <span>للتواصل العلمي: yarahyari41@gmail.com</span>
+          </div>
 
-      <footer
-        style={{
-          padding: '15px 20px',
-          backgroundColor: 'white',
-          borderTop: '1px solid #e2e8f0'
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            gap: '10px',
-            backgroundColor: '#f1f5f9',
-            borderRadius: '25px',
-            padding: '5px 15px',
-            alignItems: 'center'
-          }}
-        >
-          <input
-            type="text"
-            placeholder="اسأل عن طرق فرز النفايات..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            disabled={isLoading}
-            style={{
-              flex: 1,
-              border: 'none',
-              background: 'transparent',
-              padding: '10px',
-              outline: 'none'
-            }}
-          />
-
-          <button
-            onClick={handleSendMessage}
-            disabled={isLoading}
-            style={{
-              background: '#1b4332',
-              color: 'white',
-              border: 'none',
-              borderRadius: '50%',
-              padding: '10px',
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-              opacity: isLoading ? 0.7 : 1
-            }}
-          >
-            <Send size={18} />
+          <button className="clear-chat-link" onClick={clearChat} type="button">
+            <Trash2 size={14} />
+            <span>مسح المحادثة الحالية</span>
           </button>
-        </div>
-
-        <div
-          style={{
-            textAlign: 'center',
-            fontSize: '10px',
-            color: '#888',
-            marginTop: '8px'
-          }}
-        >
-          <Mail size={10} /> للتواصل العلمي: yarahyari41@gmail.com
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 }
