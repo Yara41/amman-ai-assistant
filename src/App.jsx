@@ -56,27 +56,27 @@ export default function App() {
 
     try {
 
-      const response = await fetch(
-        'https://yarahyari41.app.n8n.cloud/webhook/recycling-assistant',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            question: messageText
-          })
-        }
-      );
+const response = await fetch('/.netlify/functions/chat', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    question: messageText
+  })
+});
 
-      const data = await response.json();
+const data = await response.json();
 
-      const aiMessage = {
-        id: Date.now() + 1,
-        role: 'ai',
-        text:
-          data.output ||
-          data.text ||
-          'تم استلام رسالتك بنجاح من نظام n8n.'
-      };
+const aiMessage = {
+  id: Date.now() + 1,
+  role: 'ai',
+  text:
+    data.reply ||
+    data.output ||
+    data.text ||
+    'تم استلام رسالتك بنجاح من نظام n8n.'
+};
 
       setMessages(prev => [...prev, aiMessage]);
 
