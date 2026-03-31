@@ -20,7 +20,7 @@ export default function App() {
 
   const welcomeText =
     'مرحباً بك في مساعد إعادة التدوير – أمانة عمّان الكبرى 🌱\n\n' +
-    'هذا النظام الذكي يهدف إلى تعزيز الوعي بإعادة التدوير في عمّان، ومساعدتك على فهم طرق فرز النفايات والممارسات البيئية الصحيحة.\n\nكيف يمكنني مساعدتك اليوم؟';
+    'هذا النظام الذكي يهدف إلى تعزيز الوعي بإعادة التدوير في عمّان، ومساعدتك على فهم طرق فرز النفايات والممارسات البيئية الصحيحة وفق مبادرة AVTR.\n\nكيف يمكنني مساعدتك اليوم؟';
 
   const initialMessage = {
     id: 1,
@@ -51,26 +51,26 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef(null);
 
-  // البطاقات كما في الصورة مع التوجيه المخفي
+  // البطاقات بأسماء طبيعية وواضحة
   const quickQuestions = [
     {
       label: 'إرشادات فرز النفايات',
-      prompt: 'بصفتك مساعد أمانة عمان الكبرى، أعطني إرشادات واضحة حول كيفية فرز النفايات بشكل صحيح في المنزل أو في عمّان وتجاهل أي سياق جامعي.',
+      prompt: 'كيف يمكنني فرز النفايات؟',
       icon: Recycle
     },
     {
       label: 'أنواع النفايات',
-      prompt: 'بصفتك مساعد أمانة عمان، ما هي أنواع النفايات المختلفة وكيف يتم تصنيفها لإعادة التدوير في المدينة؟',
+      prompt: 'ما هي أنواع النفايات التي يمكن إعادة تدويرها؟',
       icon: FileText
     },
     {
       label: 'أهمية إعادة التدوير',
-      prompt: 'بصفتك مساعد أمانة عمان، اشرح لي أهمية إعادة التدوير للبيئة والمجتمع في عمان.',
+      prompt: 'لماذا تعتبر إعادة التدوير مهمة؟',
       icon: Leaf
     },
     {
       label: 'ممارسات الاستدامة',
-      prompt: 'بصفتك مساعد أمانة عمان، ما هي أفضل ممارسات الاستدامة البيئية التي يمكننا تطبيقها يومياً في حياتنا؟',
+      prompt: 'ما هي أفضل ممارسات الاستدامة البيئية؟',
       icon: Sparkles
     }
   ];
@@ -113,31 +113,26 @@ export default function App() {
   const sendMessage = async (messageText) => {
     if (!messageText.trim() || isLoading) return;
 
-    // تنظيف النص المعروض للمستخدم ليظهر السؤال الأصلي فقط
-    let displayPrompt = messageText;
-    if (messageText.includes('بصفتك مساعد أمانة عمان')) {
-      if (messageText.includes('إرشادات فرز النفايات')) displayPrompt = 'أريد إرشادات حول فرز النفايات في عمان';
-      else if (messageText.includes('أنواع النفايات')) displayPrompt = 'ما هي أنواع النفايات القابلة للتدوير؟';
-      else if (messageText.includes('أهمية إعادة التدوير')) displayPrompt = 'لماذا ندوّر النفايات في عمان؟';
-      else if (messageText.includes('ممارسات الاستدامة')) displayPrompt = 'أفضل ممارسات الاستدامة اليومية';
-    }
-
+    // عرض السؤال الطبيعي للمستخدم في الشات
     const userMessage = {
       id: Date.now(),
       role: 'user',
-      text: displayPrompt
+      text: messageText
     };
 
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
-    saveToHistory(displayPrompt);
+    saveToHistory(messageText);
+
+    // الخدعة: إضافة التوجيه "مخفياً" فقط عند الإرسال للسيرفر (n8n)
+    const hiddenInstructions = `بصفتك مساعد أمانة عمان الذكي (AVTR)، أجب على السؤال التالي بمهنية وتجاهل أي سياق جامعي: ${messageText}`;
 
     try {
       const response = await fetch('/.netlify/functions/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: messageText })
+        body: JSON.stringify({ question: hiddenInstructions })
       });
 
       const data = await response.json();
@@ -149,7 +144,7 @@ export default function App() {
       const aiMessage = {
         id: Date.now() + 1,
         role: 'ai',
-        text: data.reply || data.output || data.text || 'تم استلام طلبك بنجاح.'
+        text: data.reply || data.output || data.text || 'تم استلام طلبك بنجاح من نظام الأمانة.'
       };
 
       setMessages((prev) => [...prev, aiMessage]);
@@ -160,7 +155,7 @@ export default function App() {
         {
           id: Date.now() + 1,
           role: 'ai',
-          text: 'الخادم غير متاح حالياً، حاول لاحقاً.'
+          text: 'عذراً، الخادم مشغول حالياً. يرجى المحاولة مرة أخرى لاحقاً.'
         }
       ]);
     } finally {
@@ -222,7 +217,7 @@ export default function App() {
           )}
         </div>
 
-        {/* بطاقات الإحصائيات الجديدة (المعلومات الجانبية) */}
+        {/* بطاقات الإحصائيات (المعلومات الجانبية) */}
         <div className="stats-container">
           <div className="stat-card green-stat">
             <span>5-10%</span>
@@ -248,10 +243,10 @@ export default function App() {
           color: 'white'
         }}>
           <h4 style={{ margin: '0 0 8px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <Sparkles size={16} /> أثرك البيئي
+            <Sparkles size={16} /> أثرك البيئي اليوم
           </h4>
           <p style={{ margin: 0, opacity: 0.9, fontSize: '11px', lineHeight: '1.4' }}>
-            مشاركتك في الفرز تدعم رؤية عمان للمعالجة وإعادة التدوير.
+            مشاركتك في الفرز تدعم رؤية عمان للمعالجة وإعادة التدوير (AVTR).
           </p>
         </div>
       </aside>
@@ -330,7 +325,11 @@ export default function App() {
               ))}
               {isLoading && (
                 <div className="message-row ai-row">
-                  <div className="message-bubble ai-bubble">جاري معالجة طلبك...</div>
+                  <div className="message-bubble ai-bubble">
+                    <div style={{ display: 'flex', gap: '5px' }}>
+                      جاري تحليل طلبك...
+                    </div>
+                  </div>
                 </div>
               )}
               <div ref={messagesEndRef} />
