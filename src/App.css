@@ -1,36 +1,7 @@
-
+/* استيراد خط تجوال العربي */
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
 
-body {
-  margin: 0;
-  background: var(--bg-main);
-  color: var(--text-main);
-  /* تعديل الخط هنا ليكون تجوال */
-  font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* تعديل بسيط لضمان ظهور القوائم بشكل صحيح في العربي */
-.markdown-content ul,
-.markdown-content ol {
-  padding-right: 25px; /* المسافة من اليمين للنقاط */
-  padding-left: 0;
-  margin: 10px 0;
-  direction: rtl;
-}
-
-.markdown-content li {
-  margin-bottom: 6px;
-  list-style-position: outside;
-}
-
-/* تعديل الـ welcome section ليكون الخط متناسق */
-.welcome-section h2 {
-  margin: 0 0 14px;
-  font-size: 42px; /* صغرت الحجم شوي عشان العربي ما يطلع ضخم جداً */
-  line-height: 1.3;
-  color: #10233d;
-  font-weight: 800;
-}:root {
+:root {
   --primary-green: #165c43;
   --primary-green-dark: #124734;
   --soft-green: #e8f5ee;
@@ -50,7 +21,9 @@ body {
   margin: 0;
   background: var(--bg-main);
   color: var(--text-main);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  /* اعتماد خط تجوال لجميع عناصر الموقع */
+  font-family: 'Tajawal', sans-serif;
+  direction: rtl;
 }
 
 .app-shell {
@@ -59,6 +32,7 @@ body {
   background: var(--bg-main);
 }
 
+/* القائمة الجانبية - Sidebar */
 .sidebar {
   width: 310px;
   background: #f7faf8;
@@ -102,14 +76,14 @@ body {
 
 .brand-box h2 {
   margin: 0;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   color: var(--primary-green-dark);
 }
 
 .brand-box p {
-  margin: 4px 0 0;
-  font-size: 14px;
+  margin: 2px 0 0;
+  font-size: 12px;
   color: #5f8c77;
 }
 
@@ -118,12 +92,13 @@ body {
   background: #edf8f1;
   color: #11835d;
   border-radius: 999px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   width: fit-content;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 13px;
 }
 
 .status-dot {
@@ -139,30 +114,33 @@ body {
   background: #eaf7ef;
   color: var(--primary-green-dark);
   border-radius: 16px;
-  padding: 16px 18px;
+  padding: 14px 18px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   transition: 0.2s ease;
+  font-family: 'Tajawal', sans-serif;
 }
 
 .new-chat-btn:hover {
   background: #def2e6;
 }
 
+/* سجل المحادثات */
 .history-box h3 {
   margin: 0 0 16px;
   color: #7d8b84;
-  font-size: 18px;
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .history-empty {
   color: #95a39c;
-  font-size: 14px;
+  font-size: 13px;
   margin: 0;
 }
 
@@ -172,7 +150,7 @@ body {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .history-item {
@@ -180,17 +158,81 @@ body {
   align-items: center;
   gap: 10px;
   color: #2f463b;
-  font-size: 16px;
+  font-size: 14px;
+  cursor: default;
 }
 
 .history-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background: #66d19e;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
+/* الإحصائيات الجانبية */
+.stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.stat-card {
+  padding: 12px;
+  border-radius: 12px;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.stat-card span {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 10px;
+  opacity: 0.9;
+  line-height: 1.3;
+}
+
+.green-stat { background-color: #27a75b; color: white; }
+.dark-stat { background-color: #1a232e; color: white; }
+.light-stat { background-color: #f1f3f5; color: #1a232e; border: 1px solid #e9ecef; }
+
+/* أزرار الروابط الخارجية */
+.links-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.link-card-btn {
+  background: white;
+  border: 1px solid var(--border-soft);
+  border-radius: 12px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.link-card-btn:hover {
+  background: var(--soft-green);
+  border-color: var(--primary-green);
+}
+
+/* منطقة الدردشة الرئيسية */
 .chat-layout {
   flex: 1;
   display: flex;
@@ -201,413 +243,173 @@ body {
 .topbar {
   background: var(--primary-green);
   color: white;
-  padding: 18px 28px;
+  padding: 16px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-}
-
-.topbar-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.icon-btn {
-  width: 42px;
-  height: 42px;
-  border: none;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.14);
-  color: white;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.survey-btn {
-  border: none;
-  background: #f3a81f;
-  color: #1f2c25;
-  border-radius: 14px;
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  cursor: pointer;
 }
 
 .topbar-brand {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .topbar-brand h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: 17px;
+  font-weight: 700;
 }
 
 .topbar-brand p {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   color: #c6ead7;
-  font-size: 13px;
-}
-
-.topbar-logo {
-  color: #5ac78b;
+  font-size: 12px;
 }
 
 .chat-main {
   flex: 1;
   overflow-y: auto;
-  padding: 26px;
+  padding: 24px;
 }
 
+/* قسم الترحيب الرئيسي */
 .welcome-section {
-  max-width: 860px;
+  max-width: 800px;
   margin: 0 auto;
   text-align: center;
-  padding: 30px 10px 10px;
-}
-
-.welcome-icon {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 22px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, var(--soft-green), #cde8da);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #149066;
+  padding: 40px 10px;
 }
 
 .welcome-section h2 {
   margin: 0 0 14px;
-  font-size: 52px;
-  line-height: 1.25;
+  font-size: 36px;
+  line-height: 1.3;
   color: #10233d;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 .welcome-section p {
-  margin: 0 auto 28px;
-  max-width: 760px;
-  font-size: 19px;
-  line-height: 1.9;
+  font-size: 18px;
   color: #66788a;
+  line-height: 1.7;
 }
 
 .quick-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  max-width: 860px;
-  margin: 0 auto;
+  margin-top: 30px;
 }
 
 .quick-card {
-  border: 1px solid #e3ebe6;
   background: white;
-  border-radius: 20px;
-  padding: 18px 20px;
+  border: 1px solid #e3ebe6;
+  border-radius: 16px;
+  padding: 16px;
   display: flex;
   align-items: center;
   gap: 12px;
-  justify-content: center;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
-  color: #2f3e35;
-  transition: 0.2s ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  transition: 0.2s;
+  font-family: 'Tajawal', sans-serif;
 }
 
 .quick-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
-  border-color: #cfe7d9;
+  border-color: var(--primary-green);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-.quick-card-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  background: #eef7f2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #11835d;
-}
-
+/* فقاعات الرسائل */
 .messages-section {
-  max-width: 980px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
-.message-row {
-  display: flex;
-  margin-bottom: 16px;
-}
-
-.user-row {
-  justify-content: flex-start;
-}
-
-.ai-row {
-  justify-content: flex-end;
-}
-
 .message-bubble {
-  max-width: 78%;
-  padding: 16px 20px;
-  border-radius: 20px;
-  line-height: 1.9;
-  font-size: 17px;
-  white-space: pre-wrap;
+  max-width: 80%;
+  padding: 14px 18px;
+  border-radius: 18px;
+  font-size: 16px;
+  line-height: 1.7;
 }
 
 .user-bubble {
   background: #2d6a4f;
   color: white;
-  border-top-right-radius: 8px;
+  border-top-right-radius: 4px;
 }
 
 .ai-bubble {
   background: white;
-  color: #223028;
   border: 1px solid #e1e9e4;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-  border-top-left-radius: 8px;
+  color: #223028;
+  border-top-left-radius: 4px;
 }
 
-.markdown-content {
-  line-height: 1.9;
-  font-size: 16px;
-}
-
-.markdown-content p {
-  margin: 8px 0;
-}
-
-.markdown-content ul,
-.markdown-content ol {
-  padding-right: 20px;
+/* تنسيق النصوص داخل الردود (Markdown) */
+.markdown-content ul, .markdown-content ol {
+  padding-right: 25px;
   margin: 10px 0;
+  text-align: right;
 }
 
 .markdown-content li {
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
-.markdown-content strong {
-  font-weight: 800;
-}
-
-.typing-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.typing-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #6f8d7d;
-  animation: blink 1.4s infinite ease-in-out;
-}
-
-.typing-dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-dot:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-.typing-text {
-  margin-right: 8px;
-  color: #5a6b62;
-  font-size: 14px;
-}
-
-@keyframes blink {
-  0%,
-  80%,
-  100% {
-    opacity: 0.3;
-    transform: translateY(0);
-  }
-  40% {
-    opacity: 1;
-    transform: translateY(-2px);
-  }
-}
-
+/* منطقة الإدخال - Footer */
 .chat-footer {
-  background: transparent;
-  padding: 14px 22px 10px;
+  padding: 20px;
 }
 
 .input-shell {
-  max-width: 980px;
+  max-width: 900px;
   margin: 0 auto;
-  background: #ffffff;
-  border: 1px solid #dde7e1;
-  border-radius: 26px;
-  padding: 8px 10px;
+  background: white;
+  border: 1px solid var(--border-soft);
+  border-radius: 24px;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.04);
+  padding: 6px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
 .chat-input {
   flex: 1;
   border: none;
-  background: transparent;
+  padding: 10px 15px;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 16px;
   outline: none;
-  padding: 14px 16px;
-  font-size: 18px;
-  color: #24372d;
 }
 
 .send-btn {
-  width: 46px;
-  height: 46px;
-  border: none;
-  border-radius: 50%;
   background: var(--primary-green);
   color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.send-btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
 }
 
 .footer-email {
-  max-width: 980px;
-  margin: 10px auto 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
+  text-align: center;
+  font-size: 11px;
   color: #7b8c84;
-  font-size: 11px;
-  direction: rtl;
-  text-align: center;
+  margin-top: 10px;
 }
 
-.footer-email-icon {
-  flex-shrink: 0;
-  vertical-align: middle;
-}
-
-.clear-chat-link {
-  margin: 10px auto 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border: none;
-  background: transparent;
-  color: #7d8b84;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-@media (max-width: 1100px) {
-  .sidebar {
-    display: none;
-  }
-
-  .welcome-section h2 {
-    font-size: 40px;
-  }
-}
-
+/* الاستجابة للهواتف */
 @media (max-width: 768px) {
-  .quick-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .welcome-section h2 {
-    font-size: 32px;
-  }
-
-  .topbar {
-    padding: 14px 16px;
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .topbar-left,
-  .topbar-brand {
-    justify-content: space-between;
-  }
-
-  .message-bubble {
-    max-width: 92%;
-  }
-
-  .survey-btn span {
-    display: none;
-  }
-}
-.stats-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.stat-card {
-  padding: 15px;
-  border-radius: 12px;
-  text-align: center;
-  transition: transform 0.2s;
-}
-
-.stat-card:hover {
-  transform: scale(1.02);
-}
-
-.stat-card span {
-  display: block;
-  font-size: 18px;
-  font-weight: 800;
-  margin-bottom: 4px;
-}
-
-.stat-card p {
-  margin: 0;
-  font-size: 11px;
-  opacity: 0.9;
-  line-height: 1.4;
-}
-
-/* الألوان حسب الصورة */
-.green-stat {
-  background-color: #27a75b;
-  color: white;
-}
-
-.dark-stat {
-  background-color: #1a232e;
-  color: white;
-}
-
-.light-stat {
-  background-color: #f1f3f5;
-  color: #1a232e;
-  border: 1px solid #e9ecef;
+  .sidebar { display: none; }
+  .quick-grid { grid-template-columns: 1fr; }
+  .welcome-section h2 { font-size: 28px; }
+  .topbar-brand h1 { font-size: 14px; }
 }

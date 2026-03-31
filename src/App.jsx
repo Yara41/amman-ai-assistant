@@ -12,15 +12,16 @@ import {
   Plus,
   Sparkles,
   ExternalLink,
-  MapPin
+  Globe
 } from 'lucide-react';
 import './App.css';
 
 export default function App() {
 
+  // تعديل نص الترحيب ليكون عاماً ومهنياً
   const welcomeText =
-    'مرحباً بك في مساعد إعادة التدوير – أمانة عمّان الكبرى 🌱\n\n' +
-    'هذا النظام الذكي يهدف إلى تعزيز الوعي بإعادة التدوير في عمّان، ومساعدتك على فهم طرق فرز النفايات والممارسات البيئية الصحيحة وفق مبادرة AVTR.\n\nكيف يمكنني مساعدتك اليوم؟';
+    'مرحباً بك في مساعد أمانة عمان الذكي لإعادة التدوير 🌍\n\n' +
+    'أنا هنا لمساعدتك في فهم نظام إدارة النفايات في العاصمة، وتقديم إرشادات حول الفرز الصحيح والممارسات المستدامة.\n\nكيف يمكنني مساعدتك اليوم؟';
 
   const initialMessage = {
     id: 1,
@@ -51,25 +52,26 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef(null);
 
+  // البطاقات الأربع (الأسئلة العامة) بناءً على الداتا الجديدة
   const quickQuestions = [
     {
-      label: 'إرشادات فرز النفايات',
-      prompt: 'كيف يمكنني فرز النفايات؟',
+      label: 'الفصل من المصدر',
+      prompt: 'ما هو مفهوم "الفصل من المصدر" وكيف أطبقه؟',
       icon: Recycle
     },
     {
-      label: 'أنواع النفايات',
-      prompt: 'ما هي أنواع النفايات التي يمكن إعادة تدويرها؟',
-      icon: FileText
-    },
-    {
-      label: 'أهمية إعادة التدوير',
-      prompt: 'لماذا تعتبر إعادة التدوير مهمة؟',
+      label: 'حماية البيئة',
+      prompt: 'كيف تساعد إعادة التدوير في حماية بيئة عمان؟',
       icon: Leaf
     },
     {
-      label: 'ممارسات الاستدامة',
-      prompt: 'ما هي أفضل ممارسات الاستدامة البيئية؟',
+      label: 'الفرز المنزلي',
+      prompt: 'ما هي أنواع النفايات التي يمكنني فرزها في المنزل؟',
+      icon: FileText
+    },
+    {
+      label: 'مبادئ الـ 3R\'s',
+      prompt: 'تعرف على مبادئ الـ 3R\'s لإدارة النفايات.',
       icon: Sparkles
     }
   ];
@@ -123,8 +125,8 @@ export default function App() {
     setIsLoading(true);
     saveToHistory(messageText);
 
-    // هذا البرومبت سيجبره على استخدام معرفته لصالح سكان عمان وتجاهل أي سياق سابق للجامعات
-    const forcedPrompt = `تجاهل أي تعليمات سابقة بخصوص الجامعات. بصفتك الخبير التقني الرسمي لأمانة عمان الكبرى ومبادرة AVTR، استخدم كامل معرفتك العلمية حول فرز النفايات وإعادة التدوير لتجيب على هذا السؤال لسكان مدينة عمان بأسلوب عملي ومباشر: ${messageText}`;
+    // البرومبت الموجه لنظام أمانة عمان (RAG)
+    const forcedPrompt = `بصفتك المساعد الذكي الرسمي لأمانة عمان الكبرى، أجب على هذا السؤال بناءً على قاعدة المعرفة المتوفرة لديك بأسلوب مهني وواضح: ${messageText}`;
 
     try {
       const response = await fetch('/.netlify/functions/chat', {
@@ -138,7 +140,7 @@ export default function App() {
       const aiMessage = {
         id: Date.now() + 1,
         role: 'ai',
-        text: data.reply || data.output || data.text || 'تم استلام طلبك.'
+        text: data.reply || data.output || data.text || 'عذراً، لم أستطع معالجة طلبك حالياً.'
       };
 
       setMessages((prev) => [...prev, aiMessage]);
@@ -149,7 +151,7 @@ export default function App() {
         {
           id: Date.now() + 1,
           role: 'ai',
-          text: 'عذراً، الخادم مشغول حالياً. يرجى المحاولة مرة أخرى لاحقاً.'
+          text: 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة لاحقاً.'
         }
       ]);
     } finally {
@@ -180,13 +182,14 @@ export default function App() {
               <Recycle size={20} />
             </div>
             <div>
-              <h2>مساعد عمان الذكي</h2>
-              <p>مبادرة AVTR 🌱</p>
+              {/* المسمى الجديد الجانبي */}
+              <h2>مساعد إعادة التدوير الذكي</h2>
+              <p style={{ fontSize: '10px' }}>Amman Smart Assistant</p>
             </div>
           </div>
           <button className="status-badge" type="button">
             <span className="status-dot"></span>
-            نظام AVTR نشط
+            AI ACTIVE
           </button>
         </div>
 
@@ -211,36 +214,32 @@ export default function App() {
           )}
         </div>
 
+        {/* إحصائيات عامة (بدون تفاصيل صادمة في البداية) */}
         <div className="stats-container">
           <div className="stat-card green-stat">
             <span>5-10%</span>
-            <p>معدل إعادة التدوير في عمان</p>
+            <p>معدل إعادة التدوير الرسمي </p>
           </div>
           
           <div className="stat-card dark-stat">
-            <span>~ 2 مليون طن</span>
-            <p>معدل تولد النفايات سنوياً</p>
+            <span>1.2 مليون طن</span>
+            <p>تولد النفايات سنوياً في الأردن </p>
           </div>
           
           <div className="stat-card light-stat">
-            <span>~ 4.06 مليون</span>
-            <p>عدد سكان عمان (إحصائية 2021)</p>
+            <span>3200 طن</span>
+            <p>نفايات عمان يومياً لمكب الغباوي </p>
           </div>
         </div>
 
-        <div className="impact-card" style={{
-          marginTop: '20px',
-          background: 'linear-gradient(135deg, #165c43, #2d6a4f)',
-          padding: '15px',
-          borderRadius: '16px',
-          color: 'white'
-        }}>
-          <h4 style={{ margin: '0 0 8px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <Sparkles size={16} /> أثرك البيئي اليوم
-          </h4>
-          <p style={{ margin: 0, opacity: 0.9, fontSize: '11px', lineHeight: '1.4' }}>
-            مشاركتك في الفرز تدعم رؤية عمان للمعالجة وإعادة التدوير (AVTR).
-          </p>
+        {/* بطاقات روابط المبادرة والأمانة */}
+        <div className="links-group" style={{ marginTop: '15px' }}>
+            <button className="link-card-btn" onClick={() => window.open('https://avtr.jo', '_blank')}>
+                <Globe size={14} /> مبادرة AVTR
+            </button>
+            <button className="link-card-btn" onClick={() => window.open('https://www.ammancity.gov.jo', '_blank')}>
+                <ExternalLink size={14} /> موقع أمانة عمان
+            </button>
         </div>
       </aside>
 
@@ -249,21 +248,13 @@ export default function App() {
           <div className="topbar-brand">
             <Recycle size={30} className="topbar-logo" />
             <div>
-              <h1>مساعد إعادة التدوير – أمانة عمّان</h1>
-              <p>نحو عاصمة خضراء ومستدامة</p>
+              {/* المسمى الرئيسي عربي وإنجليزي */}
+              <h1 style={{ fontSize: '18px' }}>Amman Smart Recycling Assistant | مساعد أمانة عمان الذكي للتدوير</h1>
+              <p>نحو عاصمة خضراء ومستدامة - Towards a Sustainable Capital</p>
             </div>
           </div>
 
           <div className="topbar-left">
-            <button
-              className="survey-btn"
-              style={{ background: '#f3a81f', color: '#13231a' }}
-              onClick={() => window.open('https://avtr.jo', '_blank')}
-            >
-              <ExternalLink size={18} />
-              <span>مبادرة AVTR</span>
-            </button>
-
             <button
               className="icon-btn"
               onClick={() => setSidebarOpen((prev) => !prev)}
@@ -280,7 +271,7 @@ export default function App() {
                 <Recycle size={40} />
               </div>
               <h2>معاً نحو عمّان أكثر استدامة 🌍</h2>
-              <p>اسأل المساعد الذكي عن طرق فرز النفايات ومبادرات إعادة التدوير في العاصمة.</p>
+              <p>اسأل المساعد الذكي عن نظام إدارة النفايات وكيفية المساهمة في الحفاظ على بيئة العاصمة.</p>
               <div className="quick-grid">
                 {quickQuestions.map((item, index) => {
                   const Icon = item.icon;
@@ -318,7 +309,7 @@ export default function App() {
               ))}
               {isLoading && (
                 <div className="message-row ai-row">
-                  <div className="message-bubble ai-bubble">جاري تحليل طلبك...</div>
+                  <div className="message-bubble ai-bubble">جاري تحليل البيانات...</div>
                 </div>
               )}
               <div ref={messagesEndRef} />
@@ -330,7 +321,7 @@ export default function App() {
           <div className="input-shell">
             <input
               type="text"
-              placeholder="اسأل عن مراكز التدوير في عمان..."
+              placeholder="اسأل عن إدارة النفايات في عمان..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
