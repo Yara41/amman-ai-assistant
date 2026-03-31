@@ -18,7 +18,6 @@ import './App.css';
 
 export default function App() {
 
-  // تعديل نص الترحيب ليكون عاماً ومهنياً
   const welcomeText =
     'مرحباً بك في مساعد أمانة عمان الذكي لإعادة التدوير 🌍\n\n' +
     'أنا هنا لمساعدتك في فهم نظام إدارة النفايات في العاصمة، وتقديم إرشادات حول الفرز الصحيح والممارسات المستدامة.\n\nكيف يمكنني مساعدتك اليوم؟';
@@ -52,7 +51,6 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef(null);
 
-  // البطاقات الأربع (الأسئلة العامة) بناءً على الداتا الجديدة
   const quickQuestions = [
     {
       label: 'الفصل من المصدر',
@@ -125,18 +123,17 @@ export default function App() {
     setIsLoading(true);
     saveToHistory(messageText);
 
-    // البرومبت الموجه لنظام أمانة عمان (RAG)
-    const forcedPrompt = `بصفتك المساعد الذكي الرسمي لأمانة عمان الكبرى، أجب على هذا السؤال بناءً على قاعدة المعرفة المتوفرة لديك بأسلوب مهني وواضح: ${messageText}`;
+    const forcedPrompt = `بصفتك المساعد الذكي الرسمي لأمانة عمان الكبرى، أجب على هذا السؤال بأسلوب مهني وواضح: ${messageText}`;
 
     try {
       const response = await fetch('/.netlify/functions/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: forcedPrompt }) 
+        body: JSON.stringify({ question: forcedPrompt })
       });
 
       const data = await response.json();
-      
+
       const aiMessage = {
         id: Date.now() + 1,
         role: 'ai',
@@ -145,13 +142,12 @@ export default function App() {
 
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
-      console.error(error);
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 1,
           role: 'ai',
-          text: 'عذراً، حدث خطأ في الاتصال. يرجى المحاولة لاحقاً.'
+          text: 'عذراً، حدث خطأ في الاتصال.'
         }
       ]);
     } finally {
@@ -175,19 +171,21 @@ export default function App() {
 
   return (
     <div className="app-shell" dir="rtl">
+
       <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
+
         <div className="sidebar-header">
           <div className="brand-box">
             <div className="brand-icon">
               <Recycle size={20} />
             </div>
             <div>
-              {/* المسمى الجديد الجانبي */}
-              <h2>مساعد إعادة التدوير الذكي</h2>
-              <p style={{ fontSize: '10px' }}>Amman Smart Assistant</p>
+              <h2>مساعد إعادة التدوير</h2>
+              <p style={{ fontSize: '11px' }}>Amman Smart Assistant</p>
             </div>
           </div>
-          <button className="status-badge" type="button">
+
+          <button className="status-badge">
             <span className="status-dot"></span>
             AI ACTIVE
           </button>
@@ -214,54 +212,49 @@ export default function App() {
           )}
         </div>
 
-        {/* إحصائيات عامة (بدون تفاصيل صادمة في البداية) */}
-        <div className="stats-container">
-          <div className="stat-card green-stat">
-            <span>5-10%</span>
-            <p>معدل إعادة التدوير الرسمي </p>
-          </div>
-          
-          <div className="stat-card dark-stat">
-            <span>1.2 مليون طن</span>
-            <p>تولد النفايات سنوياً في الأردن </p>
-          </div>
-          
-          <div className="stat-card light-stat">
-            <span>3200 طن</span>
-            <p>نفايات عمان يومياً لمكب الغباوي </p>
-          </div>
-        </div>
+        {/* 🔥 روابط رسمية بدل الإحصائيات */}
+        <div className="city-links">
 
-        {/* بطاقات روابط المبادرة والأمانة */}
-        <div className="links-group" style={{ marginTop: '15px' }}>
-            <button className="link-card-btn" onClick={() => window.open('https://avtr.jo', '_blank')}>
-                <Globe size={14} /> مبادرة AVTR
-            </button>
-            <button className="link-card-btn" onClick={() => window.open('https://www.ammancity.gov.jo', '_blank')}>
-                <ExternalLink size={14} /> موقع أمانة عمان
-            </button>
-        </div>
-      </aside>
-
-      <div className="chat-layout">
-        <header className="topbar">
-          <div className="topbar-brand">
-            <Recycle size={30} className="topbar-logo" />
-            <div>
-              {/* المسمى الرئيسي عربي وإنجليزي */}
-              <h1 style={{ fontSize: '18px' }}>Amman Smart Recycling Assistant | مساعد أمانة عمان الذكي للتدوير</h1>
-              <p>نحو عاصمة خضراء ومستدامة - Towards a Sustainable Capital</p>
+          <div
+            className="city-card"
+            onClick={() => window.open('https://www.ammancity.gov.jo', '_blank')}
+          >
+            <div className="city-card-title">موقع أمانة عمّان</div>
+            <div className="city-card-desc">
+              خدمات البلدية وإدارة النفايات في العاصمة
             </div>
           </div>
 
-          <div className="topbar-left">
-            <button
-              className="icon-btn"
-              onClick={() => setSidebarOpen((prev) => !prev)}
-            >
-              <PanelRight size={18} />
-            </button>
+          <div
+            className="city-card"
+            onClick={() => window.open('https://avtr.jo', '_blank')}
+          >
+            <div className="city-card-title">مبادرة AVTR</div>
+            <div className="city-card-desc">
+              منصة لإعادة التدوير وتعزيز المشاركة المجتمعية
+            </div>
           </div>
+
+        </div>
+
+      </aside>
+
+      <div className="chat-layout">
+
+        <header className="topbar">
+          <div className="topbar-brand">
+            <Recycle size={30} />
+            <div>
+              <h1 style={{ fontSize: '18px' }}>
+                Amman Smart Recycling Assistant
+              </h1>
+              <p>نحو عمّان خضراء ومستدامة</p>
+            </div>
+          </div>
+
+          <button className="icon-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
+            <PanelRight size={18} />
+          </button>
         </header>
 
         <main className="chat-main">
@@ -270,8 +263,13 @@ export default function App() {
               <div className="welcome-icon">
                 <Recycle size={40} />
               </div>
+
               <h2>معاً نحو عمّان أكثر استدامة 🌍</h2>
-              <p>اسأل المساعد الذكي عن نظام إدارة النفايات وكيفية المساهمة في الحفاظ على بيئة العاصمة.</p>
+
+              <p>
+                اسأل عن إدارة النفايات، الفرز، أو الاستدامة داخل المدينة.
+              </p>
+
               <div className="quick-grid">
                 {quickQuestions.map((item, index) => {
                   const Icon = item.icon;
@@ -281,9 +279,7 @@ export default function App() {
                       className="quick-card"
                       onClick={() => handleQuickQuestion(item.prompt)}
                     >
-                      <div className="quick-card-icon">
-                        <Icon size={16} />
-                      </div>
+                      <Icon size={16} />
                       <span>{item.label}</span>
                     </button>
                   );
@@ -296,22 +292,22 @@ export default function App() {
                 <div key={msg.id} className={`message-row ${msg.role === 'user' ? 'user-row' : 'ai-row'}`}>
                   <div className={`message-bubble ${msg.role === 'user' ? 'user-bubble' : 'ai-bubble'}`}>
                     {msg.role === 'ai' ? (
-                      <div className="markdown-content">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {msg.text}
-                        </ReactMarkdown>
-                      </div>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {msg.text}
+                      </ReactMarkdown>
                     ) : (
                       msg.text
                     )}
                   </div>
                 </div>
               ))}
+
               {isLoading && (
                 <div className="message-row ai-row">
-                  <div className="message-bubble ai-bubble">جاري تحليل البيانات...</div>
+                  <div className="message-bubble ai-bubble">جاري المعالجة...</div>
                 </div>
               )}
+
               <div ref={messagesEndRef} />
             </section>
           )}
@@ -321,26 +317,30 @@ export default function App() {
           <div className="input-shell">
             <input
               type="text"
-              placeholder="اسأل عن إدارة النفايات في عمان..."
+              placeholder="اسأل عن النفايات في عمّان..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               disabled={isLoading}
               className="chat-input"
             />
+
             <button onClick={handleSendMessage} disabled={isLoading} className="send-btn">
               <Send size={18} />
             </button>
           </div>
+
           <div className="footer-email">
             <Mail size={12} />
-            <span>للتواصل العلمي: yarahyari41@gmail.com</span>
+            <span>yarahyari41@gmail.com</span>
           </div>
+
           <button className="clear-chat-link" onClick={clearChat}>
             <Trash2 size={14} />
-            <span>بدء جلسة جديدة</span>
+            <span>إعادة المحادثة</span>
           </button>
         </footer>
+
       </div>
     </div>
   );
