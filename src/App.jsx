@@ -126,8 +126,7 @@ export default function App() {
     saveToHistory(messageText);
 
     // الخدعة: إضافة التوجيه "مخفياً" فقط عند الإرسال للسيرفر (n8n)
-    const hiddenInstructions = `بصفتك مساعد أمانة عمان الذكي (AVTR)، أجب على السؤال التالي بمهنية وتجاهل أي سياق جامعي: ${messageText}`;
-
+   const hiddenInstructions = `أنت الآن المساعد الذكي الرسمي لأمانة عمان الكبرى ومبادرة AVTR. بناءً على معرفتك الواسعة في إعادة التدوير، أجب على السؤال التالي بلهجة رسمية ومهنية تخدم سكان مدينة عمان: ${messageText}`;
     try {
       const response = await fetch('/.netlify/functions/chat', {
         method: 'POST',
