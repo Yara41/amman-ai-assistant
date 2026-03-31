@@ -16,9 +16,10 @@ import {
 import './App.css';
 
 export default function App() {
+
   const welcomeText =
-    'مرحباً بك في مساعد إعادة التدوير الذكي للجامعات الأردنية 🌱\n\n' +
-    'ابدأ بسؤال بسيط حول إعادة التدوير أو الاستدامة، وسأرشدك إلى معلومات عملية تدعم بيئة جامعية أفضل.';
+    'مرحباً بك في مساعد إعادة التدوير – أمانة عمّان الكبرى 🌱\n\n' +
+    'هذا النظام الذكي يهدف إلى تعزيز الوعي بإعادة التدوير في عمّان، ومساعدتك على فهم طرق فرز النفايات والممارسات البيئية الصحيحة.\n\nكيف يمكنني مساعدتك اليوم؟';
 
   const initialMessage = {
     id: 1,
@@ -51,23 +52,23 @@ export default function App() {
 
   const quickQuestions = [
     {
-      label: 'إرشادات فرز النفايات',
-      prompt: 'كيف يمكن فرز النفايات بشكل صحيح داخل الحرم الجامعي؟',
+      label: 'فرز النفايات',
+      prompt: 'كيف يمكنني فرز النفايات بشكل صحيح في المنزل أو في عمّان؟',
       icon: Recycle
     },
     {
-      label: 'أنواع النفايات',
-      prompt: 'ما هي أنواع النفايات التي يمكن أن تنتج داخل الجامعة؟',
+      label: 'أنواع القابلة للتدوير',
+      prompt: 'ما هي النفايات التي يمكن إعادة تدويرها؟',
       icon: FileText
     },
     {
       label: 'أهمية إعادة التدوير',
-      prompt: 'ما أهمية إعادة التدوير للبيئة والمجتمع؟',
+      prompt: 'لماذا تعتبر إعادة التدوير مهمة للبيئة؟',
       icon: Leaf
     },
     {
-      label: 'ممارسات الاستدامة',
-      prompt: 'ما أهم ممارسات الاستدامة البيئية التي يمكن تطبيقها داخل الجامعة؟',
+      label: 'سلوكيات بيئية',
+      prompt: 'ما هي أفضل الممارسات البيئية التي يمكنني اتباعها يومياً؟',
       icon: Sparkles
     }
   ];
@@ -125,12 +126,8 @@ export default function App() {
     try {
       const response = await fetch('/.netlify/functions/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          question: messageText
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: messageText })
       });
 
       const data = await response.json();
@@ -182,6 +179,7 @@ export default function App() {
 
   return (
     <div className="app-shell" dir="rtl">
+
       <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
           <div className="brand-box">
@@ -189,8 +187,8 @@ export default function App() {
               <Recycle size={20} />
             </div>
             <div>
-              <h2>المساعد الذكي</h2>
-              <p>لإعادة التدوير في الجامعات</p>
+              <h2>مساعد إعادة التدوير</h2>
+              <p>أمانة عمّان الكبرى</p>
             </div>
           </div>
 
@@ -200,7 +198,7 @@ export default function App() {
           </button>
         </div>
 
-        <button className="new-chat-btn" onClick={startNewChat} type="button">
+        <button className="new-chat-btn" onClick={startNewChat}>
           <Plus size={16} />
           <span>محادثة جديدة</span>
         </button>
@@ -209,7 +207,7 @@ export default function App() {
           <h3>السجل الأخير</h3>
 
           {chatHistory.length === 0 ? (
-            <p className="history-empty">لا توجد محادثات محفوظة بعد</p>
+            <p className="history-empty">لا توجد محادثات بعد</p>
           ) : (
             <ul className="history-list">
               {chatHistory.map((item, index) => (
@@ -224,12 +222,13 @@ export default function App() {
       </aside>
 
       <div className="chat-layout">
+
         <header className="topbar">
           <div className="topbar-brand">
             <Recycle size={30} className="topbar-logo" />
             <div>
-              <h1>Recycling AI Assistant</h1>
-              <p>نظام ذكي لتعزيز الوعي بإعادة التدوير في الجامعات الأردنية</p>
+              <h1>مساعد إعادة التدوير – أمانة عمّان الكبرى</h1>
+              <p>نظام ذكي لتعزيز الوعي بإعادة التدوير والسلوكيات البيئية</p>
             </div>
           </div>
 
@@ -239,17 +238,14 @@ export default function App() {
               onClick={() =>
                 window.open('https://forms.gle/W3xtwb49j7NsWHF59', '_blank')
               }
-              type="button"
             >
               <ClipboardCheck size={18} />
-              <span>شاركنا رأيك بالاستبيان</span>
+              <span>شاركنا رأيك</span>
             </button>
 
             <button
               className="icon-btn"
               onClick={() => setSidebarOpen((prev) => !prev)}
-              type="button"
-              title="إظهار/إخفاء القائمة الجانبية"
             >
               <PanelRight size={18} />
             </button>
@@ -263,10 +259,10 @@ export default function App() {
                 <Recycle size={40} />
               </div>
 
-              <h2>حرم جامعي مستدام، مستقبل أذكى</h2>
+              <h2>معاً نحو عمّان أكثر استدامة 🌍</h2>
               <p>
-                اسألني عن إعادة التدوير، فرز النفايات، والممارسات البيئية داخل
-                الحرم الجامعي، وسأساعدك بمعلومات واضحة وعملية.
+                اسأل عن إعادة التدوير، فرز النفايات، أو السلوكيات البيئية اليومية،
+                وسأساعدك بمعلومات بسيطة وعملية.
               </p>
 
               <div className="quick-grid">
@@ -278,7 +274,6 @@ export default function App() {
                       key={index}
                       className="quick-card"
                       onClick={() => handleQuickQuestion(item.prompt)}
-                      type="button"
                     >
                       <div className="quick-card-icon">
                         <Icon size={16} />
@@ -319,12 +314,7 @@ export default function App() {
               {isLoading && (
                 <div className="message-row ai-row">
                   <div className="message-bubble ai-bubble">
-                    <div className="typing-wrap">
-                      <span className="typing-dot"></span>
-                      <span className="typing-dot"></span>
-                      <span className="typing-dot"></span>
-                      <span className="typing-text">جاري التفكير...</span>
-                    </div>
+                    جاري التفكير...
                   </div>
                 </div>
               )}
@@ -338,7 +328,7 @@ export default function App() {
           <div className="input-shell">
             <input
               type="text"
-              placeholder="اسأل عن طرق فرز النفايات..."
+              placeholder="اسأل عن إعادة التدوير أو فرز النفايات..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -350,20 +340,19 @@ export default function App() {
               onClick={handleSendMessage}
               disabled={isLoading}
               className="send-btn"
-              type="button"
             >
               <Send size={18} />
             </button>
           </div>
 
           <div className="footer-email">
-            <Mail size={12} className="footer-email-icon" />
+            <Mail size={12} />
             <span>للتواصل العلمي: yarahyari41@gmail.com</span>
           </div>
 
-          <button className="clear-chat-link" onClick={clearChat} type="button">
+          <button className="clear-chat-link" onClick={clearChat}>
             <Trash2 size={14} />
-            <span>مسح المحادثة الحالية</span>
+            <span>مسح المحادثة</span>
           </button>
         </footer>
       </div>
