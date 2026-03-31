@@ -11,7 +11,6 @@ import {
   PanelRight,
   Plus,
   Sparkles,
-  MapPin,
   ExternalLink
 } from 'lucide-react';
 import './App.css';
@@ -19,8 +18,8 @@ import './App.css';
 export default function App() {
 
   const welcomeText =
-    'مرحباً بك في مساعد إعادة التدوير الذكي – أمانة عمّان الكبرى 🌱\n\n' +
-    'هذا النظام يهدف إلى دعم مبادرات عمان الخضراء وتعزيز الوعي بطرق فرز النفايات والممارسات البيئية المستدامة في مدينتنا.\n\nكيف يمكنني مساعدتك اليوم؟';
+    'مرحباً بك في مساعد إعادة التدوير – أمانة عمّان الكبرى 🌱\n\n' +
+    'هذا النظام الذكي يهدف إلى تعزيز الوعي بإعادة التدوير في عمّان، ومساعدتك على فهم طرق فرز النفايات والممارسات البيئية الصحيحة.\n\nكيف يمكنني مساعدتك اليوم؟';
 
   const initialMessage = {
     id: 1,
@@ -51,26 +50,26 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef(null);
 
-  // تحديث الأسئلة لتوجيه الـ AI برمجياً نحو هوية أمانة عمان
+  // الأسئلة الأصلية مع توجيه مخفي للـ AI
   const quickQuestions = [
     {
-      label: 'فرز النفايات في عمان',
-      prompt: 'بصفتك مساعد أمانة عمان الذكي، كيف يمكنني فرز النفايات بشكل صحيح في منزلي داخل عمان؟ اذكر الخطوات المتبعة في المدينة وتجاهل أي سياق جامعي.',
+      label: 'فرز النفايات',
+      prompt: 'بصفتك مساعد أمانة عمان الكبرى، كيف يمكنني فرز النفايات بشكل صحيح في المنزل أو في عمّان؟ اذكر القواعد العامة وتجنب ذكر الجامعات.',
       icon: Recycle
     },
     {
-      label: 'مراكز تجميع المواد',
-      prompt: 'أين يمكنني العثور على حاويات إعادة التدوير أو مراكز التجميع التابعة لأمانة عمان (مثل مبادرة AVTR) في مناطق العاصمة؟',
-      icon: MapPin
-    },
-    {
-      label: 'النفايات الإلكترونية',
-      prompt: 'كيف توفر أمانة عمان طرقاً للتخلص من النفايات الإلكترونية والأثاث القديم بشكل بيئي صحيح؟',
+      label: 'أنواع القابلة للتدوير',
+      prompt: 'بصفتك مساعد أمانة عمان، ما هي النفايات التي يمكن إعادة تدويرها بشكل عام في مدينتنا؟',
       icon: FileText
     },
     {
-      label: 'رؤية عمان الخضراء',
-      prompt: 'ما هي مبادرة Amman Vision (AVTR) وكيف تساهم في تحويل النفايات إلى مواد معاد تدويرها في الأردن؟',
+      label: 'أهمية إعادة التدوير',
+      prompt: 'بصفتك مساعد أمانة عمان، لماذا تعتبر إعادة التدوير مهمة للبيئة في مدينة مثل عمان؟',
+      icon: Leaf
+    },
+    {
+      label: 'سلوكيات بيئية',
+      prompt: 'بصفتك مساعد أمانة عمان، ما هي أفضل الممارسات البيئية التي يمكنني اتباعها يومياً في عمان؟',
       icon: Sparkles
     }
   ];
@@ -113,16 +112,25 @@ export default function App() {
   const sendMessage = async (messageText) => {
     if (!messageText.trim() || isLoading) return;
 
-    const userDisplayMessage = {
+    // فلترة النص ليظهر للمستخدم بشكل طبيعي في الشات
+    let displayPrompt = messageText;
+    if (messageText.includes('بصفتك مساعد أمانة عمان')) {
+      if (messageText.includes('فرز النفايات')) displayPrompt = 'كيف يمكنني فرز النفايات بشكل صحيح؟';
+      else if (messageText.includes('النفايات التي يمكن إعادة تدويرها')) displayPrompt = 'ما هي النفايات التي يمكن إعادة تدويرها؟';
+      else if (messageText.includes('أهمية إعادة التدوير')) displayPrompt = 'لماذا تعتبر إعادة التدوير مهمة للبيئة؟';
+      else if (messageText.includes('أفضل الممارسات البيئية')) displayPrompt = 'ما هي أفضل الممارسات البيئية اليومية؟';
+    }
+
+    const userMessage = {
       id: Date.now(),
       role: 'user',
-      text: messageText.includes('بصفتك مساعد أمانة عمان') ? 'كيف يمكنني فرز النفايات؟' : messageText 
+      text: displayPrompt
     };
 
-    setMessages((prev) => [...prev, userDisplayMessage]);
+    setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
-    saveToHistory(userDisplayMessage.text);
+    saveToHistory(displayPrompt);
 
     try {
       const response = await fetch('/.netlify/functions/chat', {
@@ -140,7 +148,7 @@ export default function App() {
       const aiMessage = {
         id: Date.now() + 1,
         role: 'ai',
-        text: data.reply || data.output || data.text || 'تم استلام رسالتك بنجاح من النظام.'
+        text: data.reply || data.output || data.text || 'تم استلام رسالتك بنجاح.'
       };
 
       setMessages((prev) => [...prev, aiMessage]);
@@ -175,7 +183,6 @@ export default function App() {
 
   return (
     <div className="app-shell" dir="rtl">
-
       <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
         <div className="sidebar-header">
           <div className="brand-box">
@@ -184,10 +191,9 @@ export default function App() {
             </div>
             <div>
               <h2>مساعد عمان الذكي</h2>
-              <p>رؤية عمان 2030 🌱</p>
+              <p>مبادرة AVTR 🌱</p>
             </div>
           </div>
-
           <button className="status-badge" type="button">
             <span className="status-dot"></span>
             نظام AVTR نشط
@@ -215,20 +221,18 @@ export default function App() {
           )}
         </div>
 
-        {/* إضافة "حركة" الأثر البيئي المستوحاة من الموقع العالمي للمبادرة */}
         <div className="impact-card" style={{
           marginTop: 'auto',
           background: 'linear-gradient(135deg, #165c43, #2d6a4f)',
-          padding: '20px',
-          borderRadius: '20px',
+          padding: '15px',
+          borderRadius: '16px',
           color: 'white'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-            <Sparkles size={18} />
-            <strong style={{ fontSize: '14px' }}>أثرك البيئي اليوم</strong>
-          </div>
-          <p style={{ margin: 0, fontSize: '12px', lineHeight: '1.6', opacity: 0.9 }}>
-            بمشاركتك في الفرز، تساهم في تقليل الانبعاثات الكربونية في عمّان. كل خطوة صغيرة تصنع فرقاً كبيراً!
+          <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <Sparkles size={16} /> أثرك البيئي اليوم
+          </h4>
+          <p style={{ margin: 0, opacity: 0.9, fontSize: '12px', lineHeight: '1.4' }}>
+            مشاركتك في رؤية عمان للمعالجة وإعادة التدوير (AVTR) تساهم في حماية مستقبلنا.
           </p>
         </div>
       </aside>
@@ -239,7 +243,7 @@ export default function App() {
             <Recycle size={30} className="topbar-logo" />
             <div>
               <h1>مساعد إعادة التدوير – أمانة عمّان</h1>
-              <p>نحو عاصمة خضراء ومستدامة</p>
+              <p>نظام ذكي لدعم مبادرة AVTR</p>
             </div>
           </div>
 
@@ -247,9 +251,7 @@ export default function App() {
             <button
               className="survey-btn"
               style={{ background: '#f3a81f', color: '#13231a' }}
-              onClick={() =>
-                window.open('https://www.ammanvision.jo/', '_blank')
-              }
+              onClick={() => window.open('https://avtr.jo', '_blank')}
             >
               <ExternalLink size={18} />
               <span>مبادرة AVTR</span>
@@ -270,13 +272,8 @@ export default function App() {
               <div className="welcome-icon">
                 <Recycle size={40} />
               </div>
-
               <h2>معاً نحو عمّان أكثر استدامة 🌍</h2>
-              <p>
-                استكشف مبادرات أمانة عمان لإعادة التدوير، وتعرف على طرق فرز النفايات
-                في منطقتك من خلال المساعد الذكي.
-              </p>
-
+              <p>اسأل المساعد الذكي عن طرق فرز النفايات ومبادرات إعادة التدوير في عمان.</p>
               <div className="quick-grid">
                 {quickQuestions.map((item, index) => {
                   const Icon = item.icon;
@@ -298,13 +295,8 @@ export default function App() {
           ) : (
             <section className="messages-section">
               {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`message-row ${msg.role === 'user' ? 'user-row' : 'ai-row'}`}
-                >
-                  <div
-                    className={`message-bubble ${msg.role === 'user' ? 'user-bubble' : 'ai-bubble'}`}
-                  >
+                <div key={msg.id} className={`message-row ${msg.role === 'user' ? 'user-row' : 'ai-row'}`}>
+                  <div className={`message-bubble ${msg.role === 'user' ? 'user-bubble' : 'ai-bubble'}`}>
                     {msg.role === 'ai' ? (
                       <div className="markdown-content">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -317,14 +309,9 @@ export default function App() {
                   </div>
                 </div>
               ))}
-
               {isLoading && (
                 <div className="message-row ai-row">
-                  <div className="message-bubble ai-bubble">
-                    <div style={{ display: 'flex', gap: '5px' }}>
-                      جاري تحليل طلبك للأمانة...
-                    </div>
-                  </div>
+                  <div className="message-bubble ai-bubble">جاري التفكير...</div>
                 </div>
               )}
               <div ref={messagesEndRef} />
@@ -336,27 +323,21 @@ export default function App() {
           <div className="input-shell">
             <input
               type="text"
-              placeholder="اسأل عن مراكز التدوير في عمان..."
+              placeholder="اسأل عن إعادة التدوير في عمان..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               disabled={isLoading}
               className="chat-input"
             />
-            <button
-              onClick={handleSendMessage}
-              disabled={isLoading}
-              className="send-btn"
-            >
+            <button onClick={handleSendMessage} disabled={isLoading} className="send-btn">
               <Send size={18} />
             </button>
           </div>
-
           <div className="footer-email">
             <Mail size={12} />
             <span>للتواصل العلمي: yarahyari41@gmail.com</span>
           </div>
-
           <button className="clear-chat-link" onClick={clearChat}>
             <Trash2 size={14} />
             <span>بدء جلسة جديدة</span>
