@@ -11,7 +11,8 @@ import {
   PanelRight,
   Plus,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  MapPin
 } from 'lucide-react';
 import './App.css';
 
@@ -50,26 +51,26 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef(null);
 
-  // الأسئلة الأصلية مع توجيه مخفي للـ AI
+  // البطاقات كما في الصورة مع التوجيه المخفي
   const quickQuestions = [
     {
-      label: 'فرز النفايات',
-      prompt: 'بصفتك مساعد أمانة عمان الكبرى، كيف يمكنني فرز النفايات بشكل صحيح في المنزل أو في عمّان؟ اذكر القواعد العامة وتجنب ذكر الجامعات.',
+      label: 'إرشادات فرز النفايات',
+      prompt: 'بصفتك مساعد أمانة عمان الكبرى، أعطني إرشادات واضحة حول كيفية فرز النفايات بشكل صحيح في المنزل أو في عمّان وتجاهل أي سياق جامعي.',
       icon: Recycle
     },
     {
-      label: 'أنواع القابلة للتدوير',
-      prompt: 'بصفتك مساعد أمانة عمان، ما هي النفايات التي يمكن إعادة تدويرها بشكل عام في مدينتنا؟',
+      label: 'أنواع النفايات',
+      prompt: 'بصفتك مساعد أمانة عمان، ما هي أنواع النفايات المختلفة وكيف يتم تصنيفها لإعادة التدوير في المدينة؟',
       icon: FileText
     },
     {
       label: 'أهمية إعادة التدوير',
-      prompt: 'بصفتك مساعد أمانة عمان، لماذا تعتبر إعادة التدوير مهمة للبيئة في مدينة مثل عمان؟',
+      prompt: 'بصفتك مساعد أمانة عمان، اشرح لي أهمية إعادة التدوير للبيئة والمجتمع في عمان.',
       icon: Leaf
     },
     {
-      label: 'سلوكيات بيئية',
-      prompt: 'بصفتك مساعد أمانة عمان، ما هي أفضل الممارسات البيئية التي يمكنني اتباعها يومياً في عمان؟',
+      label: 'ممارسات الاستدامة',
+      prompt: 'بصفتك مساعد أمانة عمان، ما هي أفضل ممارسات الاستدامة البيئية التي يمكننا تطبيقها يومياً في حياتنا؟',
       icon: Sparkles
     }
   ];
@@ -112,13 +113,13 @@ export default function App() {
   const sendMessage = async (messageText) => {
     if (!messageText.trim() || isLoading) return;
 
-    // فلترة النص ليظهر للمستخدم بشكل طبيعي في الشات
+    // تنظيف النص المعروض للمستخدم ليظهر السؤال الأصلي فقط
     let displayPrompt = messageText;
     if (messageText.includes('بصفتك مساعد أمانة عمان')) {
-      if (messageText.includes('فرز النفايات')) displayPrompt = 'كيف يمكنني فرز النفايات بشكل صحيح؟';
-      else if (messageText.includes('النفايات التي يمكن إعادة تدويرها')) displayPrompt = 'ما هي النفايات التي يمكن إعادة تدويرها؟';
-      else if (messageText.includes('أهمية إعادة التدوير')) displayPrompt = 'لماذا تعتبر إعادة التدوير مهمة للبيئة؟';
-      else if (messageText.includes('أفضل الممارسات البيئية')) displayPrompt = 'ما هي أفضل الممارسات البيئية اليومية؟';
+      if (messageText.includes('إرشادات فرز النفايات')) displayPrompt = 'أريد إرشادات حول فرز النفايات في عمان';
+      else if (messageText.includes('أنواع النفايات')) displayPrompt = 'ما هي أنواع النفايات القابلة للتدوير؟';
+      else if (messageText.includes('أهمية إعادة التدوير')) displayPrompt = 'لماذا ندوّر النفايات في عمان؟';
+      else if (messageText.includes('ممارسات الاستدامة')) displayPrompt = 'أفضل ممارسات الاستدامة اليومية';
     }
 
     const userMessage = {
@@ -148,7 +149,7 @@ export default function App() {
       const aiMessage = {
         id: Date.now() + 1,
         role: 'ai',
-        text: data.reply || data.output || data.text || 'تم استلام رسالتك بنجاح.'
+        text: data.reply || data.output || data.text || 'تم استلام طلبك بنجاح.'
       };
 
       setMessages((prev) => [...prev, aiMessage]);
@@ -221,18 +222,36 @@ export default function App() {
           )}
         </div>
 
+        {/* بطاقات الإحصائيات الجديدة (المعلومات الجانبية) */}
+        <div className="stats-container">
+          <div className="stat-card green-stat">
+            <span>5-10%</span>
+            <p>معدل إعادة التدوير في عمان</p>
+          </div>
+          
+          <div className="stat-card dark-stat">
+            <span>~ 2 مليون طن</span>
+            <p>معدل تولد النفايات سنوياً</p>
+          </div>
+          
+          <div className="stat-card light-stat">
+            <span>~ 4.06 مليون</span>
+            <p>عدد سكان عمان (إحصائية 2021)</p>
+          </div>
+        </div>
+
         <div className="impact-card" style={{
-          marginTop: 'auto',
+          marginTop: '20px',
           background: 'linear-gradient(135deg, #165c43, #2d6a4f)',
           padding: '15px',
           borderRadius: '16px',
           color: 'white'
         }}>
-          <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-            <Sparkles size={16} /> أثرك البيئي اليوم
+          <h4 style={{ margin: '0 0 8px 0', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <Sparkles size={16} /> أثرك البيئي
           </h4>
-          <p style={{ margin: 0, opacity: 0.9, fontSize: '12px', lineHeight: '1.4' }}>
-            مشاركتك في رؤية عمان للمعالجة وإعادة التدوير (AVTR) تساهم في حماية مستقبلنا.
+          <p style={{ margin: 0, opacity: 0.9, fontSize: '11px', lineHeight: '1.4' }}>
+            مشاركتك في الفرز تدعم رؤية عمان للمعالجة وإعادة التدوير.
           </p>
         </div>
       </aside>
@@ -243,7 +262,7 @@ export default function App() {
             <Recycle size={30} className="topbar-logo" />
             <div>
               <h1>مساعد إعادة التدوير – أمانة عمّان</h1>
-              <p>نظام ذكي لدعم مبادرة AVTR</p>
+              <p>نحو عاصمة خضراء ومستدامة</p>
             </div>
           </div>
 
@@ -273,7 +292,7 @@ export default function App() {
                 <Recycle size={40} />
               </div>
               <h2>معاً نحو عمّان أكثر استدامة 🌍</h2>
-              <p>اسأل المساعد الذكي عن طرق فرز النفايات ومبادرات إعادة التدوير في عمان.</p>
+              <p>اسأل المساعد الذكي عن طرق فرز النفايات ومبادرات إعادة التدوير في العاصمة.</p>
               <div className="quick-grid">
                 {quickQuestions.map((item, index) => {
                   const Icon = item.icon;
@@ -311,7 +330,7 @@ export default function App() {
               ))}
               {isLoading && (
                 <div className="message-row ai-row">
-                  <div className="message-bubble ai-bubble">جاري التفكير...</div>
+                  <div className="message-bubble ai-bubble">جاري معالجة طلبك...</div>
                 </div>
               )}
               <div ref={messagesEndRef} />
@@ -323,7 +342,7 @@ export default function App() {
           <div className="input-shell">
             <input
               type="text"
-              placeholder="اسأل عن إعادة التدوير في عمان..."
+              placeholder="اسأل عن مراكز التدوير في عمان..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
