@@ -51,7 +51,6 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef(null);
 
-  // البطاقات بأسماء طبيعية وواضحة
   const quickQuestions = [
     {
       label: 'إرشادات فرز النفايات',
@@ -113,17 +112,6 @@ export default function App() {
   const sendMessage = async (messageText) => {
     if (!messageText.trim() || isLoading) return;
 
-    // عرض السؤال الطبيعي للمستخدم في الشات
-    const userMessage = {
-      id: Date.now(),
-      role: 'user',
-      text: messageText
-    };
-
-   const sendMessage = async (messageText) => {
-    if (!messageText.trim() || isLoading) return;
-
-    // عرض السؤال للمستخدم بشكل طبيعي
     const userMessage = {
       id: Date.now(),
       role: 'user',
@@ -133,8 +121,9 @@ export default function App() {
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
+    saveToHistory(messageText);
 
-    // البرومبت العام والبسيط
+    // البرومبت العام اللي بخليه يجاوب من معلوماته كلها للأمانة
     const simplePrompt = `${messageText} (أجب بصفتك خبيراً في إعادة التدوير لخدمة سكان مدينة عمان)`;
 
     try {
@@ -155,10 +144,9 @@ export default function App() {
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      setMessages((prev) => [
+        ...prev,
+        {
           id: Date.now() + 1,
           role: 'ai',
           text: 'عذراً، الخادم مشغول حالياً. يرجى المحاولة مرة أخرى لاحقاً.'
@@ -223,7 +211,6 @@ export default function App() {
           )}
         </div>
 
-        {/* بطاقات الإحصائيات (المعلومات الجانبية) */}
         <div className="stats-container">
           <div className="stat-card green-stat">
             <span>5-10%</span>
@@ -331,11 +318,7 @@ export default function App() {
               ))}
               {isLoading && (
                 <div className="message-row ai-row">
-                  <div className="message-bubble ai-bubble">
-                    <div style={{ display: 'flex', gap: '5px' }}>
-                      جاري تحليل طلبك...
-                    </div>
-                  </div>
+                  <div className="message-bubble ai-bubble">جاري تحليل طلبك...</div>
                 </div>
               )}
               <div ref={messagesEndRef} />
