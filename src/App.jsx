@@ -7,19 +7,20 @@ import {
   Leaf,
   Recycle,
   Mail,
-  ClipboardCheck,
   Trash2,
   PanelRight,
   Plus,
-  Sparkles
+  Sparkles,
+  MapPin,
+  ExternalLink
 } from 'lucide-react';
 import './App.css';
 
 export default function App() {
 
   const welcomeText =
-    'مرحباً بك في مساعد إعادة التدوير – أمانة عمّان الكبرى 🌱\n\n' +
-    'هذا النظام الذكي يهدف إلى تعزيز الوعي بإعادة التدوير في عمّان، ومساعدتك على فهم طرق فرز النفايات والممارسات البيئية الصحيحة.\n\nكيف يمكنني مساعدتك اليوم؟';
+    'مرحباً بك في مساعد إعادة التدوير الذكي – أمانة عمّان الكبرى 🌱\n\n' +
+    'هذا النظام يهدف إلى دعم مبادرات عمان الخضراء وتعزيز الوعي بطرق فرز النفايات والممارسات البيئية المستدامة في مدينتنا.\n\nكيف يمكنني مساعدتك اليوم؟';
 
   const initialMessage = {
     id: 1,
@@ -28,7 +29,7 @@ export default function App() {
   };
 
   const [messages, setMessages] = useState(() => {
-    const savedMessages = localStorage.getItem('chatMessages');
+    const savedMessages = localStorage.getItem('amman_chat_messages');
     try {
       return savedMessages ? JSON.parse(savedMessages) : [initialMessage];
     } catch {
@@ -37,7 +38,7 @@ export default function App() {
   });
 
   const [chatHistory, setChatHistory] = useState(() => {
-    const savedHistory = localStorage.getItem('chatHistory');
+    const savedHistory = localStorage.getItem('amman_chat_history');
     try {
       return savedHistory ? JSON.parse(savedHistory) : [];
     } catch {
@@ -50,35 +51,36 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const messagesEndRef = useRef(null);
 
+  // تحديث الأسئلة لتوجيه الـ AI برمجياً نحو هوية أمانة عمان
   const quickQuestions = [
     {
-      label: 'فرز النفايات',
-      prompt: 'كيف يمكنني فرز النفايات بشكل صحيح في المنزل أو في عمّان؟',
+      label: 'فرز النفايات في عمان',
+      prompt: 'بصفتك مساعد أمانة عمان الذكي، كيف يمكنني فرز النفايات بشكل صحيح في منزلي داخل عمان؟ اذكر الخطوات المتبعة في المدينة وتجاهل أي سياق جامعي.',
       icon: Recycle
     },
     {
-      label: 'أنواع القابلة للتدوير',
-      prompt: 'ما هي النفايات التي يمكن إعادة تدويرها؟',
+      label: 'مراكز تجميع المواد',
+      prompt: 'أين يمكنني العثور على حاويات إعادة التدوير أو مراكز التجميع التابعة لأمانة عمان (مثل مبادرة AVTR) في مناطق العاصمة؟',
+      icon: MapPin
+    },
+    {
+      label: 'النفايات الإلكترونية',
+      prompt: 'كيف توفر أمانة عمان طرقاً للتخلص من النفايات الإلكترونية والأثاث القديم بشكل بيئي صحيح؟',
       icon: FileText
     },
     {
-      label: 'أهمية إعادة التدوير',
-      prompt: 'لماذا تعتبر إعادة التدوير مهمة للبيئة؟',
-      icon: Leaf
-    },
-    {
-      label: 'سلوكيات بيئية',
-      prompt: 'ما هي أفضل الممارسات البيئية التي يمكنني اتباعها يومياً؟',
+      label: 'رؤية عمان الخضراء',
+      prompt: 'ما هي مبادرة Amman Vision (AVTR) وكيف تساهم في تحويل النفايات إلى مواد معاد تدويرها في الأردن؟',
       icon: Sparkles
     }
   ];
 
   useEffect(() => {
-    localStorage.setItem('chatMessages', JSON.stringify(messages));
+    localStorage.setItem('amman_chat_messages', JSON.stringify(messages));
   }, [messages]);
 
   useEffect(() => {
-    localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    localStorage.setItem('amman_chat_history', JSON.stringify(chatHistory));
   }, [chatHistory]);
 
   useEffect(() => {
@@ -92,7 +94,6 @@ export default function App() {
 
   const saveToHistory = (question) => {
     const title = createChatTitle(question);
-
     setChatHistory((prev) => {
       const updated = [title, ...prev.filter((item) => item !== title)];
       return updated.slice(0, 6);
@@ -101,7 +102,7 @@ export default function App() {
 
   const clearChat = () => {
     setMessages([initialMessage]);
-    localStorage.setItem('chatMessages', JSON.stringify([initialMessage]));
+    localStorage.setItem('amman_chat_messages', JSON.stringify([initialMessage]));
   };
 
   const startNewChat = () => {
@@ -112,16 +113,16 @@ export default function App() {
   const sendMessage = async (messageText) => {
     if (!messageText.trim() || isLoading) return;
 
-    const userMessage = {
+    const userDisplayMessage = {
       id: Date.now(),
       role: 'user',
-      text: messageText
+      text: messageText.includes('بصفتك مساعد أمانة عمان') ? 'كيف يمكنني فرز النفايات؟' : messageText 
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userDisplayMessage]);
     setInputValue('');
     setIsLoading(true);
-    saveToHistory(messageText);
+    saveToHistory(userDisplayMessage.text);
 
     try {
       const response = await fetch('/.netlify/functions/chat', {
@@ -139,17 +140,12 @@ export default function App() {
       const aiMessage = {
         id: Date.now() + 1,
         role: 'ai',
-        text:
-          data.reply ||
-          data.output ||
-          data.text ||
-          'تم استلام رسالتك بنجاح من النظام.'
+        text: data.reply || data.output || data.text || 'تم استلام رسالتك بنجاح من النظام.'
       };
 
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       console.error('Connection Error:', error);
-
       setMessages((prev) => [
         ...prev,
         {
@@ -187,14 +183,14 @@ export default function App() {
               <Recycle size={20} />
             </div>
             <div>
-              <h2>مساعد إعادة التدوير</h2>
-              <p>أمانة عمّان الكبرى</p>
+              <h2>مساعد عمان الذكي</h2>
+              <p>رؤية عمان 2030 🌱</p>
             </div>
           </div>
 
           <button className="status-badge" type="button">
             <span className="status-dot"></span>
-            AI Active
+            نظام AVTR نشط
           </button>
         </div>
 
@@ -205,7 +201,6 @@ export default function App() {
 
         <div className="history-box">
           <h3>السجل الأخير</h3>
-
           {chatHistory.length === 0 ? (
             <p className="history-empty">لا توجد محادثات بعد</p>
           ) : (
@@ -219,28 +214,45 @@ export default function App() {
             </ul>
           )}
         </div>
+
+        {/* إضافة "حركة" الأثر البيئي المستوحاة من الموقع العالمي للمبادرة */}
+        <div className="impact-card" style={{
+          marginTop: 'auto',
+          background: 'linear-gradient(135deg, #165c43, #2d6a4f)',
+          padding: '20px',
+          borderRadius: '20px',
+          color: 'white'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+            <Sparkles size={18} />
+            <strong style={{ fontSize: '14px' }}>أثرك البيئي اليوم</strong>
+          </div>
+          <p style={{ margin: 0, fontSize: '12px', lineHeight: '1.6', opacity: 0.9 }}>
+            بمشاركتك في الفرز، تساهم في تقليل الانبعاثات الكربونية في عمّان. كل خطوة صغيرة تصنع فرقاً كبيراً!
+          </p>
+        </div>
       </aside>
 
       <div className="chat-layout">
-
         <header className="topbar">
           <div className="topbar-brand">
             <Recycle size={30} className="topbar-logo" />
             <div>
-              <h1>مساعد إعادة التدوير – أمانة عمّان الكبرى</h1>
-              <p>نظام ذكي لتعزيز الوعي بإعادة التدوير والسلوكيات البيئية</p>
+              <h1>مساعد إعادة التدوير – أمانة عمّان</h1>
+              <p>نحو عاصمة خضراء ومستدامة</p>
             </div>
           </div>
 
           <div className="topbar-left">
             <button
               className="survey-btn"
+              style={{ background: '#f3a81f', color: '#13231a' }}
               onClick={() =>
-                window.open('https://forms.gle/W3xtwb49j7NsWHF59', '_blank')
+                window.open('https://www.ammanvision.jo/', '_blank')
               }
             >
-              <ClipboardCheck size={18} />
-              <span>شاركنا رأيك</span>
+              <ExternalLink size={18} />
+              <span>مبادرة AVTR</span>
             </button>
 
             <button
@@ -261,14 +273,13 @@ export default function App() {
 
               <h2>معاً نحو عمّان أكثر استدامة 🌍</h2>
               <p>
-                اسأل عن إعادة التدوير، فرز النفايات، أو السلوكيات البيئية اليومية،
-                وسأساعدك بمعلومات بسيطة وعملية.
+                استكشف مبادرات أمانة عمان لإعادة التدوير، وتعرف على طرق فرز النفايات
+                في منطقتك من خلال المساعد الذكي.
               </p>
 
               <div className="quick-grid">
                 {quickQuestions.map((item, index) => {
                   const Icon = item.icon;
-
                   return (
                     <button
                       key={index}
@@ -289,14 +300,10 @@ export default function App() {
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`message-row ${
-                    msg.role === 'user' ? 'user-row' : 'ai-row'
-                  }`}
+                  className={`message-row ${msg.role === 'user' ? 'user-row' : 'ai-row'}`}
                 >
                   <div
-                    className={`message-bubble ${
-                      msg.role === 'user' ? 'user-bubble' : 'ai-bubble'
-                    }`}
+                    className={`message-bubble ${msg.role === 'user' ? 'user-bubble' : 'ai-bubble'}`}
                   >
                     {msg.role === 'ai' ? (
                       <div className="markdown-content">
@@ -314,11 +321,12 @@ export default function App() {
               {isLoading && (
                 <div className="message-row ai-row">
                   <div className="message-bubble ai-bubble">
-                    جاري التفكير...
+                    <div style={{ display: 'flex', gap: '5px' }}>
+                      جاري تحليل طلبك للأمانة...
+                    </div>
                   </div>
                 </div>
               )}
-
               <div ref={messagesEndRef} />
             </section>
           )}
@@ -328,14 +336,13 @@ export default function App() {
           <div className="input-shell">
             <input
               type="text"
-              placeholder="اسأل عن إعادة التدوير أو فرز النفايات..."
+              placeholder="اسأل عن مراكز التدوير في عمان..."
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               disabled={isLoading}
               className="chat-input"
             />
-
             <button
               onClick={handleSendMessage}
               disabled={isLoading}
@@ -352,7 +359,7 @@ export default function App() {
 
           <button className="clear-chat-link" onClick={clearChat}>
             <Trash2 size={14} />
-            <span>مسح المحادثة</span>
+            <span>بدء جلسة جديدة</span>
           </button>
         </footer>
       </div>
