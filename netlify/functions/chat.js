@@ -2,7 +2,7 @@ export async function handler(event) {
   try {
     const body = JSON.parse(event.body);
 
-    const response = await fetch('http://13.60.33.234:5678/webhook/recycling-assistant', {
+    const response = await fetch('http://13.61.19.235:5678/webhook/recycling-assistant', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
