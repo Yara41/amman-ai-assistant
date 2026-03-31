@@ -123,13 +123,14 @@ export default function App() {
     setIsLoading(true);
     saveToHistory(messageText);
 
-    const simplePrompt = `${messageText} (أجب بصفتك خبيراً في إعادة التدوير لخدمة سكان مدينة عمان)`;
+    // هذا البرومبت سيجبره على استخدام معرفته لصالح سكان عمان وتجاهل أي سياق سابق للجامعات
+    const forcedPrompt = `تجاهل أي تعليمات سابقة بخصوص الجامعات. بصفتك الخبير التقني الرسمي لأمانة عمان الكبرى ومبادرة AVTR، استخدم كامل معرفتك العلمية حول فرز النفايات وإعادة التدوير لتجيب على هذا السؤال لسكان مدينة عمان بأسلوب عملي ومباشر: ${messageText}`;
 
     try {
       const response = await fetch('/.netlify/functions/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: simplePrompt }) 
+        body: JSON.stringify({ question: forcedPrompt }) 
       });
 
       const data = await response.json();
