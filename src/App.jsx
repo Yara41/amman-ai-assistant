@@ -123,7 +123,6 @@ export default function App() {
     setIsLoading(true);
     saveToHistory(messageText);
 
-    // البرومبت العام اللي بخليه يجاوب من معلوماته كلها للأمانة
     const simplePrompt = `${messageText} (أجب بصفتك خبيراً في إعادة التدوير لخدمة سكان مدينة عمان)`;
 
     try {
