@@ -120,38 +120,45 @@ export default function App() {
       text: messageText
     };
 
+   const sendMessage = async (messageText) => {
+    if (!messageText.trim() || isLoading) return;
+
+    // عرض السؤال للمستخدم بشكل طبيعي
+    const userMessage = {
+      id: Date.now(),
+      role: 'user',
+      text: messageText
+    };
+
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
-    saveToHistory(messageText);
 
-    // الخدعة: إضافة التوجيه "مخفياً" فقط عند الإرسال للسيرفر (n8n)
-   const hiddenInstructions = `أنت الآن المساعد الذكي الرسمي لأمانة عمان الكبرى ومبادرة AVTR. بناءً على معرفتك الواسعة في إعادة التدوير، أجب على السؤال التالي بلهجة رسمية ومهنية تخدم سكان مدينة عمان: ${messageText}`;
+    // البرومبت العام والبسيط
+    const simplePrompt = `${messageText} (أجب بصفتك خبيراً في إعادة التدوير لخدمة سكان مدينة عمان)`;
+
     try {
       const response = await fetch('/.netlify/functions/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: hiddenInstructions })
+        body: JSON.stringify({ question: simplePrompt }) 
       });
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.details || data.error || 'Unknown server error');
-      }
-
+      
       const aiMessage = {
         id: Date.now() + 1,
         role: 'ai',
-        text: data.reply || data.output || data.text || 'تم استلام طلبك بنجاح من نظام الأمانة.'
+        text: data.reply || data.output || data.text || 'تم استلام طلبك.'
       };
 
       setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
-      console.error('Connection Error:', error);
-      setMessages((prev) => [
-        ...prev,
-        {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
           id: Date.now() + 1,
           role: 'ai',
           text: 'عذراً، الخادم مشغول حالياً. يرجى المحاولة مرة أخرى لاحقاً.'
