@@ -48,19 +48,25 @@ body {
 .app-shell {
   display: flex;
   min-height: 100vh;
+  background: var(--bg-main);
+
+  /* ✨ مهم */
+  direction: rtl;
 }
 
 .sidebar {
-  width: 300px;
-  background: #f7faf8;
-  border-left: 1px solid var(--border-soft);
-  padding: 20px;
+  width: 280px; /* بدل 310 */
+  flex-shrink: 0;
 }
 
 .chat-layout {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+
+  /* ✨ هذا الإصلاح */
+  width: 100%;
 }
 
 /* ====== TOPBAR ====== */
@@ -88,10 +94,13 @@ body {
 /* ====== WELCOME ====== */
 
 .welcome-section {
-  max-width: 820px;
-  margin: 0 auto;
+  max-width: 900px;
+  width: 100%;
+
+  margin: auto; /* ✨ هذا المهم */
+
   text-align: center;
-  padding: 20px;
+  padding: 20px 10px;
 }
 
 .welcome-section h2 {
