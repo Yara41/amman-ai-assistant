@@ -212,29 +212,27 @@ export default function App() {
           )}
         </div>
 
-        {/* 🔥 روابط رسمية بدل الإحصائيات */}
-        <div className="city-links">
-
-          <div
-            className="city-card"
+        {/* الروابط الرسمية (البطاقات الجديدة) */}
+        <div className="links-group" style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* بطاقة موقع أمانة عمان */}
+          <button 
+            className="link-card-btn" 
             onClick={() => window.open('https://www.ammancity.gov.jo', '_blank')}
+            style={{ textAlign: 'right', padding: '12px', borderRadius: '12px', border: '1px solid #dde7e1', background: 'white', cursor: 'pointer' }}
           >
-            <div className="city-card-title">موقع أمانة عمّان</div>
-            <div className="city-card-desc">
-              خدمات البلدية وإدارة النفايات في العاصمة
-            </div>
-          </div>
+            <div style={{ fontWeight: '700', fontSize: '14px', color: '#165c43' }}>موقع أمانة عمّان</div>
+            <div style={{ fontSize: '11px', color: '#5b6b63' }}>خدمات البلدية وإدارة النفايات في العاصمة</div>
+          </button>
 
-          <div
-            className="city-card"
+          {/* بطاقة مبادرة AVTR */}
+          <button 
+            className="link-card-btn" 
             onClick={() => window.open('https://avtr.jo', '_blank')}
+            style={{ textAlign: 'right', padding: '12px', borderRadius: '12px', border: '1px solid #dde7e1', background: 'white', cursor: 'pointer' }}
           >
-            <div className="city-card-title">مبادرة AVTR</div>
-            <div className="city-card-desc">
-              منصة لإعادة التدوير وتعزيز المشاركة المجتمعية
-            </div>
-          </div>
-
+            <div style={{ fontWeight: '700', fontSize: '14px', color: '#165c43' }}>مبادرة AVTR</div>
+            <div style={{ fontSize: '11px', color: '#5b6b63' }}>منصة لإعادة التدوير وتعزيز المشاركة المجتمعية</div>
+          </button>
         </div>
 
       </aside>
@@ -243,18 +241,22 @@ export default function App() {
 
         <header className="topbar">
           <div className="topbar-brand">
-            <Recycle size={30} />
+            <Recycle size={30} className="topbar-logo" />
             <div>
-              <h1 style={{ fontSize: '18px' }}>
-                Amman Smart Recycling Assistant
-              </h1>
-              <p>نحو عمّان خضراء ومستدامة</p>
+              {/* مساعد إعادة التدوير الذكي - أمانة عمان بخط خميل */}
+              <h1 style={{ fontSize: '20px', fontWeight: '800' }}>مساعد إعادة التدوير الذكي - أمانة عمان</h1>
+              <p style={{ fontSize: '12px' }}>Amman Smart Recycling Assistant</p>
             </div>
           </div>
-
-          <button className="icon-btn" onClick={() => setSidebarOpen(!sidebarOpen)}>
-            <PanelRight size={18} />
-          </button>
+          
+          <div className="topbar-left">
+            <button
+              className="icon-btn"
+              onClick={() => setSidebarOpen((prev) => !prev)}
+            >
+              <PanelRight size={18} />
+            </button>
+          </div>
         </header>
 
         <main className="chat-main">
