@@ -48,8 +48,23 @@ export default function App() {
 
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  // جعل القائمة الجانبية تغلق تلقائياً إذا كانت الشاشة صغيرة (أقل من 768 بكسل) عند بدء التشغيل
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth > 768);
   const messagesEndRef = useRef(null);
+
+  // تتبع حجم الشاشة لإغلاق القائمة عند التحويل للموبايل
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const quickQuestions = [
     {
@@ -64,7 +79,7 @@ export default function App() {
     },
     {
       label: 'الفرز المنزلي',
-      prompt: 'ما هي أنواع النفايات التي يمكنني فرزها في المنزل؟',
+      prompt: 'ما هي أنواع النفايات التي يمكنني فرزها في المنزل？',
       icon: FileText
     },
     {
@@ -99,6 +114,12 @@ export default function App() {
     });
   };
 
+  // وظيفة لحذف عنوان محادثة واحد معين من القائمة
+  const deleteHistoryItem = (e, itemToDelete) => {
+    e.stopPropagation(); // منع تفعيل أي حدث آخر عند الضغط على السلة
+    setChatHistory((prev) => prev.filter((item) => item !== itemToDelete));
+  };
+
   const clearChat = () => {
     setMessages([initialMessage]);
     localStorage.setItem('amman_chat_messages', JSON.stringify([initialMessage]));
@@ -107,6 +128,10 @@ export default function App() {
   const startNewChat = () => {
     clearChat();
     setInputValue('');
+    // على الموبايل، نغلق القائمة تلقائياً لإتاحة رؤية الشات الجديد
+    if (window.innerWidth <= 768) {
+      setSidebarOpen(false);
+    }
   };
 
   const sendMessage = async (messageText) => {
@@ -122,6 +147,11 @@ export default function App() {
     setInputValue('');
     setIsLoading(true);
     saveToHistory(messageText);
+
+    // إذا كنا على الموبايل، نغلق الـ sidebar بعد إرسال السؤال لإتاحة مساحة الرؤية
+    if (window.innerWidth <= 768) {
+      setSidebarOpen(false);
+    }
 
     const forcedPrompt = `بصفتك المساعد الذكي الرسمي لأمانة عمان الكبرى، أجب على هذا السؤال بأسلوب مهني وواضح: ${messageText}`;
 
@@ -172,6 +202,11 @@ export default function App() {
   return (
     <div className="app-shell" dir="rtl">
 
+      {/* إضافة غطاء خلفي عند فتح الـ Sidebar على الموبايل لإغلاقه بسلاسة بالنقر بالخارج */}
+      {sidebarOpen && window.innerWidth <= 768 && (
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
+      )}
+
       <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
 
         <div className="sidebar-header">
@@ -203,9 +238,20 @@ export default function App() {
           ) : (
             <ul className="history-list">
               {chatHistory.map((item, index) => (
-                <li key={index} className="history-item">
-                  <span className="history-dot"></span>
-                  <span>{item}</span>
+                <li key={index} className="history-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                    <span className="history-dot"></span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{item}</span>
+                  </div>
+                  {/* زر حذف عنصر السجل المحدد */}
+                  <button 
+                    className="delete-history-item-btn" 
+                    onClick={(e) => deleteHistoryItem(e, item)}
+                    style={{ background: 'none', border: 'none', color: '#a0aec0', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s' }}
+                    title="حذف المحادثة"
+                  >
+                    <Trash2 size={13} className="trash-icon-hover" />
+                  </button>
                 </li>
               ))}
             </ul>
@@ -243,9 +289,8 @@ export default function App() {
           <div className="topbar-brand">
             <Recycle size={30} className="topbar-logo" />
             <div>
-              {/* مساعد إعادة التدوير الذكي - أمانة عمان بخط خميل */}
-              <h1 style={{ fontSize: '20px', fontWeight: '800' }}>مساعد إعادة التدوير الذكي - أمانة عمان</h1>
-              <p style={{ fontSize: '12px' }}>Amman Smart Recycling Assistant</p>
+              <h1 style={{ fontSize: '18px', fontWeight: '800' }} className="topbar-title">مساعد إعادة التدوير الذكي - أمانة عمان</h1>
+              <p style={{ fontSize: '11px' }} className="topbar-subtitle">Amman Smart Recycling Assistant</p>
             </div>
           </div>
           
@@ -332,15 +377,17 @@ export default function App() {
             </button>
           </div>
 
-          <div className="footer-email">
-            <Mail size={12} />
-            <span>yarahyari41@gmail.com</span>
-          </div>
+          <div className="footer-actions-wrapper" style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', marginTop: '5px', gap: '10px' }}>
+            <div className="footer-email" style={{ margin: 0 }}>
+              <Mail size={12} />
+              <span>yarahyari41@gmail.com</span>
+            </div>
 
-          <button className="clear-chat-link" onClick={clearChat}>
-            <Trash2 size={14} />
-            <span>إعادة المحادثة</span>
-          </button>
+            <button className="clear-chat-link" onClick={clearChat} style={{ margin: 0 }}>
+              <Trash2 size={14} />
+              <span>إعادة المحادثة</span>
+            </button>
+          </div>
         </footer>
 
       </div>
